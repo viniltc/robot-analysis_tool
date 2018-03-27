@@ -1,2 +1,3 @@
-# robot-analysis_tool
-Robot movement analysis tool developed at [Neurolab](http://www.neurolab.dibris.unige.it/), University of Genova
+# robot-toolboxes #
+Robot toolboxes are designed for fast and effortless data analysis in Matlab developed at [Neurolab](http://www.neurolab.dibris.unige.it/), University of Genova <br/> 
+ 
