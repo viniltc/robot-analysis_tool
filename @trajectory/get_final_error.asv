@@ -1,0 +1,4 @@
+function ae = get_final_error(traj,interval,type)
+
+late_pos = traj.pos(traj.lind,:);
+target_pos = traj.ampl.*[cos(traj.angle) sin(traj.angle)]; 

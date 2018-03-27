@@ -1,0 +1,10 @@
+function [early_cacc,late_cacc]=get_centripetal_acceleration(traj)
+
+dir_vers = traj.vel./(eps+sqrt(traj.vel(:,1).^2+traj.vel(:,2).^2)*ones(1,2));
+
+tacc = traj.acc(:,1).*dir_vers(:,1)+traj.acc(:,2).*dir_vers(:,2); % vector quantity of the tangential accleration
+pacc = traj.acc - (tacc*ones(1,2)).*dir_vers; % Residual acceleration
+cacc = -pacc(:,1).*dir_vers(:,2)+pacc(:,2).*dir_vers(:,1); %Centripetal Acceleration
+
+early_cacc = std(cacc(traj.rind:traj.pkind));
+la_cacc = std(cacc(traj.pkind:traj.lind));

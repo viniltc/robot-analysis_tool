@@ -1,0 +1,54 @@
+function ae = get_aiming_error(traj,interval,type)
+% Calculates the aiming error for a given trajectory
+% INTERVAL specifies which part of the trajectory to be used. 
+%       a time value t (in s):  interval [0,t] from movement onset
+%       'all':  whole trajectory
+%       'peak': from onset to peak speed 
+% TYPE specifies the modality of calculation: 
+%       'regr' means linear regression over all samples in the interval
+%       'final': only first and last point in the interval are
+% (C) V. Sanguineti, 2008
+
+early_time = traj.time(traj.rind:end)-traj.time(traj.rind);
+nsamples = length(early_time);
+early_traj = traj.pos(traj.rind:end,:)- ones(nsamples,1)*traj.pos(traj.rind,:);
+
+switch(interval)
+    case 'all', interv_ind = traj.lind-traj.rind+1;
+    case 'peak', interv_ind = traj.pkind-traj.rind+1;  % peak velocity
+    otherwise,   interv_ind = min(round(interval*traj.fc),nsamples); % interval specified
+end
+
+
+%costruisco il modulo della traiettoria
+vettoreuno = ones(interv_ind,1);
+
+switch(type)
+    case 'regr',
+         points = 1:interv_ind;
+     case 'final',
+         points = [1 interv_ind];
+end
+
+t_coord = [early_time(points) vettoreuno(points,1)];
+% rt1 è la regressione lineare x=a1t+b1 dei punti della traiettoria (t,x);
+rt1 = [t_coord]\early_traj(points,1);
+%rt2 è la regressione lineare y=a2t+b2 dei punti della traiettoria (t,y);
+rt2 = [t_coord]\early_traj(points,2);
+
+%pars = [early_traj(1:interv_ind,1:2)]\vettoreuno(:,1);
+
+%angolo della traiettoria iniziale
+init_dir=atan2(rt2(1),rt1(1));
+%init_dir = atan2(1/pars(2),-1/pars(1));
+
+isneg = find(init_dir<0);
+init_dir(isneg) = init_dir(isneg)+2*pi;
+init_dir = rem(init_dir,2*pi);
+
+actual_dir = traj.angle; 
+ae = (init_dir-actual_dir);
+ae = rem(ae,2*pi);
+ae(find(ae > pi)) =  ae(find(ae > pi)) -2*pi;
+ae(find(ae < -pi)) =  ae(find(ae < -pi))+2*pi;
+ae = 180./pi.*ae;
